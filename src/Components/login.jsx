@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -11,7 +11,11 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import { withRouter } from "react-router-dom";
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from "react-router-dom";
+
+import firebase from "firebase/app";
+import "firebase/database";
+import "firebase/auth";
 
 function Copyright() {
   return (
@@ -27,8 +31,8 @@ function Copyright() {
 }
 //Redireccionamiento a componetes sin que recargue la pagina
 const LinkSignup = React.forwardRef((props, ref) => (
-    <RouterLink ref={ref} to="/getting-started/installation/" {...props} />
-  ));
+  <RouterLink ref={ref} to="/getting-started/installation/" {...props} />
+));
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -63,8 +67,35 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Login = () => {
+const Login = (props) => {
   const classes = useStyles();
+
+  const [user, setUser] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setUser({
+      ...user,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(user.email, user.password)
+      .then((response) => {
+        props.history.push("/");
+      })
+      .catch((error) => {
+        console.log(error);
+        alert(error.message);
+      });
+  };
 
   return (
     <Grid container component="main" className={classes.root}>
@@ -72,13 +103,16 @@ const Login = () => {
       <Grid item xs={false} sm={4} md={7} className={classes.image} />
       <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
         <div className={classes.paper}>
-          <Avatar className={classes.avatar} style={{backgroundColor: "#00bcd4"}}>
+          <Avatar
+            className={classes.avatar}
+            style={{ backgroundColor: "#00bcd4" }}
+          >
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
             Iniciar sesión
           </Typography>
-          <form className={classes.form} noValidate>
+          <form className={classes.form} onSubmit={handleLogin}>
             <TextField
               variant="outlined"
               margin="normal"
@@ -89,6 +123,8 @@ const Login = () => {
               name="email"
               autoComplete="email"
               autoFocus
+              defaultValue={user.email}
+              onChange={handleChange}
             />
             <TextField
               variant="outlined"
@@ -100,12 +136,14 @@ const Login = () => {
               type="password"
               id="password"
               autoComplete="current-password"
+              defaultValue={user.password}
+              onChange={handleChange}
             />
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              style={{backgroundColor: "#00bcd4"}}
+              style={{ backgroundColor: "#00bcd4" }}
               className={classes.submit}
             >
               Iniciar sesión
@@ -125,5 +163,5 @@ const Login = () => {
       </Grid>
     </Grid>
   );
-}
+};
 export default withRouter(Login);

@@ -4,7 +4,7 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/Menu";
+import Icon from "@material-ui/core/Icon";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,7 +23,7 @@ const Header = (props) => {
 
   return (
     <div className={classes.root}>
-      <AppBar position="static" style={{backgroundColor: "#00bcd4"}}>
+      <AppBar position="static" style={{ backgroundColor: "#00bcd4" }}>
         <Toolbar>
           <IconButton
             edge="start"
@@ -31,7 +31,7 @@ const Header = (props) => {
             color="inherit"
             aria-label="menu"
           >
-            <MenuIcon />
+            <Icon>menu</Icon>
           </IconButton>
           <Typography variant="h6" className={classes.title}>
             ChatApp

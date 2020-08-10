@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -11,13 +11,17 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { withRouter } from "react-router-dom";
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from "react-router-dom";
+
+import firebase from "firebase/app";
+import "firebase/database";
+import "firebase/auth";
 
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/">
+      <Link color="inherit" href="#">
         ChatApp by Jairo Rojas
       </Link>{" "}
       {new Date().getFullYear()}
@@ -25,10 +29,10 @@ function Copyright() {
     </Typography>
   );
 }
-
+//Redireccionamiento a componetes sin que recargue la pagina
 const LinkLogin = React.forwardRef((props, ref) => (
-    <RouterLink ref={ref} to="/getting-started/installation/" {...props} />
-  ));
+  <RouterLink ref={ref} to="/getting-started/installation/" {...props} />
+));
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -50,31 +54,77 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SignUp = () => {
+const SignUp = (props) => {
   const classes = useStyles();
+
+  const [user, setUser] = useState({
+    name: "",
+    apellidos: "",
+    avatar: "",
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setUser({
+      ...user,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    //setAlertMessage(null);
+
+    firebase
+      .auth()
+      .createUserWithEmailAndPassword(user.email, user.password)
+      .then((response) => {
+        // guardar los datos del usuario
+        delete user.password;
+        firebase.database().ref(`/users/${response.user.uid}`).set(user);
+        alert('Bienvenido a Chat App');
+        /*setAlertMessage({
+          type: "success",
+          message: "Bienvenido a Chat App",
+        });*/
+        props.history.push("/");
+      })
+      .catch((error) => {
+        console.log(error);
+        alert(error.message);
+        /*setAlertMessage({
+          type: "error",
+          message: error.message,
+        });*/
+      });
+  };
 
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Avatar className={classes.avatar} style={{backgroundColor: "#00bcd4"}}>
+        <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
           Registrarme
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
                 autoComplete="fname"
-                name="firstName"
+                name="name"
                 variant="outlined"
                 required
                 fullWidth
-                id="firstName"
-                label="Primer Nombre"
+                id="name"
+                label="Nombre"
                 autoFocus
+                value={user.name}
+                onChange={handleChange}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -82,10 +132,23 @@ const SignUp = () => {
                 variant="outlined"
                 required
                 fullWidth
-                id="lastName"
+                id="apellidos"
                 label="Apellidos"
-                name="lastName"
-                autoComplete="lname"
+                name="apellidos"
+                value={user.apellidos}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                name="avatar"
+                label="Imagen de avatar"
+                id="avatar"
+                value={user.avatar}
+                onChange={handleChange}
               />
             </Grid>
             <Grid item xs={12}>
@@ -94,9 +157,11 @@ const SignUp = () => {
                 required
                 fullWidth
                 id="email"
-                label="Nombre de Usuario"
-                name="UserName"
+                label="E-mail"
+                name="email"
                 autoComplete="UserName"
+                value={user.email}
+                onChange={handleChange}
               />
             </Grid>
             <Grid item xs={12}>
@@ -109,6 +174,8 @@ const SignUp = () => {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                value={user.password}
+                onChange={handleChange}
               />
             </Grid>
           </Grid>
@@ -118,7 +185,7 @@ const SignUp = () => {
             variant="contained"
             color="primary"
             className={classes.submit}
-            style={{backgroundColor: "#00bcd4"}}
+            style={{ backgroundColor: "#00bcd4" }}
           >
             Registrarse
           </Button>
@@ -136,6 +203,6 @@ const SignUp = () => {
       </Box>
     </Container>
   );
-}
+};
 
 export default withRouter(SignUp);

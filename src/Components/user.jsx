@@ -1,11 +1,14 @@
-import React, { Component } from "react";
-
+import React from "react";
 import IconButton from "@material-ui/core/IconButton";
-import Icon from '@material-ui/core/Icon';
-import MenuItem from "@material-ui/core/MenuItem";
+import Icon from "@material-ui/core/Icon";
+import { Link as RouterLink, withRouter } from "react-router-dom";
 import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import firebase from "firebase/app";
+import "firebase/database";
+import "firebase/auth";
 
-const User = () => {
+const User = ({ history, user, onLogout }) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
 
@@ -17,10 +20,14 @@ const User = () => {
     setAnchorEl(null);
   };
 
-  const handleLogout = () =>{
+  const handleLogout = () => {
+    setAnchorEl(null);
 
+    firebase.auth().signOut().then(() => {
+        if (onLogout) onLogout();
+        history.push("/login");
+    });
   };
-
 
   return (
     <div>
@@ -48,11 +55,10 @@ const User = () => {
         open={open}
         onClose={handleClose}
       >
-        <MenuItem disable>Jairo</MenuItem>
-        <MenuItem onClick={handleLogout}>My account</MenuItem>
+        <MenuItem disabled>{user.name}</MenuItem>
+        <MenuItem onClick={handleLogout}>Salir</MenuItem>
       </Menu>
     </div>
   );
 };
-
-export default User;
+export default withRouter(User);
