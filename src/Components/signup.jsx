@@ -12,7 +12,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { withRouter } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
-
+import Alert from './Alert'
 import firebase from "firebase/app";
 import "firebase/database";
 import "firebase/auth";
@@ -65,6 +65,8 @@ const SignUp = (props) => {
     password: "",
   });
 
+  const [signupMessage, setSignupMessage] = useState(null);
+
   const handleChange = (e) => {
     setUser({
       ...user,
@@ -75,7 +77,7 @@ const SignUp = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    //setAlertMessage(null);
+    setSignupMessage(null);
 
     firebase
       .auth()
@@ -84,20 +86,19 @@ const SignUp = (props) => {
         // guardar los datos del usuario
         delete user.password;
         firebase.database().ref(`/users/${response.user.uid}`).set(user);
-        alert('Bienvenido a Chat App');
-        /*setAlertMessage({
-          type: "success",
-          message: "Bienvenido a Chat App",
-        });*/
         props.history.push("/");
+        setSignupMessage({
+          type: "success",
+          message: "Bienvenido a ChatApp",
+        });
+        
       })
       .catch((error) => {
         console.log(error);
-        alert(error.message);
-        /*setAlertMessage({
+        setSignupMessage({
           type: "error",
           message: error.message,
-        });*/
+        });
       });
   };
 
@@ -201,6 +202,7 @@ const SignUp = (props) => {
       <Box mt={5}>
         <Copyright />
       </Box>
+      {signupMessage && <Alert type={signupMessage.type} message={signupMessage.message} autoclose={5000}/>}
     </Container>
   );
 };

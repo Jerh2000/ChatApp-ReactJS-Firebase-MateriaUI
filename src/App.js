@@ -7,6 +7,7 @@ import Routes from "./Routes";
 import firebase from "firebase/app";
 import "firebase/database";
 import "firebase/auth";
+import {loadUser} from './Utils/dbUtils'
 
 const firebaseConfig = {
   apiKey: "AIzaSyDex00A5l25hIjVvdApM1nEYVnHiqnEBa8",
@@ -24,8 +25,7 @@ firebase.initializeApp(firebaseConfig);
 function App() {
   const [user, setUser] = useState(null);
 
-
-  const onLogout = () =>{
+  const onLogout = () => {
     setUser(null);
   };
 
@@ -33,22 +33,15 @@ function App() {
     firebase.auth().onAuthStateChanged((response) => {
       if (response) {
         //Para leer los datos del usuario Logeado
-        firebase
-          .database()
-          .ref(`/users/${response.user.uid}`)
-          .once("value")
-          .then((snapshot) => {
-            setUser(snapshot.val());
-          });
+        loadUser(response.uid)
+        .then(data => {setUser(data);});
       }
     });
   }, []);
   return (
     <Router>
       <CssBaseline />
-      <Header>
-        {user && <User user={user} onLogout={onLogout}/>}
-      </Header>
+      <Header>{user && <User user={user} onLogout={onLogout} />}</Header>
       <Routes />
     </Router>
   );

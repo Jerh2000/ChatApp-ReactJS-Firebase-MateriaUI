@@ -8,12 +8,12 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import ListItemText from "@material-ui/core/ListItemText";
-import Avatar from '@material-ui/core/Avatar';
 import firebase from "firebase/app";
 import "firebase/database";
 import "firebase/auth";
-
-import Message from './Messages'
+import CustomAvatar from "../CustomAvatar";
+import {loadUser} from '../../Utils/dbUtils'
+import Message from "./Messages";
 
 const useStyles = makeStyles((theme) => ({
   text: {
@@ -21,67 +21,72 @@ const useStyles = makeStyles((theme) => ({
   },
   paper: {
     paddingBottom: 50,
-    height: '70vh',
+    height: "70vh",
     marginTop: 20,
   },
   list: {
     marginBottom: theme.spacing(3),
-    maxHeight: '95%',
-    overflow: 'auto'
+    maxHeight: "95%",
+    overflow: "auto",
   },
 }));
 
-const Chat = () => {
+const Chat = ({ history }) => {
   const classes = useStyles();
   const [messages, setMessages] = useState([]);
 
   const chatDomRef = useRef();
 
-  const addMessageList = message =>{
-      messages.push(message);
+  const addMessageList = (message) => {
+    messages.push(message);
 
-      setMessages([...messages]);
+    setMessages([...messages.sort((a, b) => a.date - b.date)]);
 
-      if (chatDomRef.current) {
-        chatDomRef.current.scrollTop = chatDomRef.current.scrollHeight;
-      }
-  }
+    if (chatDomRef.current) {
+      chatDomRef.current.scrollTop = chatDomRef.current.scrollHeight;
+    }
+  };
 
   useEffect(() => {
-    const chatRef = firebase.database().ref('/chat');
+    const chatRef = firebase.database().ref("/chat");
 
     chatRef.on(
-      'child_added',
+      "child_added",
       snapshot => {
         //New Message
         const messageItem = snapshot.val();
-        //data user
-        firebase
-          .database()
-          .ref(`/users/${messageItem.user}`)
-          .once("value")
-          .then((userResponse) => {
-            messageItem.user = userResponse.val();
+        //Leer los datos de un usuario
+        loadUser(messageItem.user)
+        .then(data => {
+            messageItem.user = data;
             addMessageList(messageItem);
-          });
+        });
       },
-      (error) => {
+      error => {
         console.log(error);
+        if (error.message.includes("permission_denied")) {
+          history.push("/login");
+        }
       }
-    );
-  },[]);
+    )
+  }, []);
 
   return (
     <Container>
       <Paper square className={classes.paper}>
-        <Typography className={classes.text} variant="h5" gutterBottom style={{ backgroundColor: "#00bcd4",color: "white" }}>
+        <Typography
+          className={classes.text}
+          variant="h5"
+          gutterBottom
+          style={{ backgroundColor: "#00bcd4", color: "white" }}
+        >
           Chats
         </Typography>
         <List className={classes.list} ref={chatDomRef}>
           {messages.map(({ date, user, message }) => (
             <ListItem button key={date}>
               <ListItemAvatar>
-                <Avatar alt={user.name} src={user.avatar} />
+                <CustomAvatar name={user.name} avatar={user.avatar} size="md" />
               </ListItemAvatar>
               <ListItemText
                 primary={user ? user.name : "annonymous"}
@@ -91,7 +96,7 @@ const Chat = () => {
           ))}
         </List>
       </Paper>
-      <Message/>
+      <Message />
     </Container>
   );
 };

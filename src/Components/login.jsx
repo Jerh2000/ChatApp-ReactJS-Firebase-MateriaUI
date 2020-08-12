@@ -12,6 +12,8 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import { withRouter } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
+import Alert from './Alert'
+
 
 import firebase from "firebase/app";
 import "firebase/database";
@@ -75,6 +77,8 @@ const Login = (props) => {
     password: "",
   });
 
+  const [errorLogin, setErrorLogin] = useState('');
+
   const handleChange = (e) => {
     setUser({
       ...user,
@@ -84,6 +88,7 @@ const Login = (props) => {
 
   const handleLogin = (e) => {
     e.preventDefault();
+    setErrorLogin('');
 
     firebase
       .auth()
@@ -93,7 +98,7 @@ const Login = (props) => {
       })
       .catch((error) => {
         console.log(error);
-        alert(error.message);
+        setErrorLogin(error.message);
       });
   };
 
@@ -161,6 +166,7 @@ const Login = (props) => {
           </form>
         </div>
       </Grid>
+      {errorLogin && <Alert type="error" message={errorLogin} autoclose={5000}/>}
     </Grid>
   );
 };
