@@ -20,6 +20,7 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: 20,
     marginTop:5,
     border: "1px solid #ccc",
+    marginRight: 20,
   },
   message: {
     border: "0px solid #ccc",

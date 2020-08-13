@@ -1,0 +1,17 @@
+.scrollers{
+    height: 475px;
+    overflow: auto;
+    border-radius: 15px;
+    
+  }
+  
+  .scrollers::-webkit-scrollbar{
+    width: 5px;
+    border-radius: 15px;
+  }
+  
+  .scrollers::-webkit-scrollbar-thumb{
+    background-color: #00ff9d;
+    
+    border-radius: 15px;
+  }

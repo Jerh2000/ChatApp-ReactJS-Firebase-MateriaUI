@@ -86,12 +86,11 @@ const SignUp = (props) => {
         // guardar los datos del usuario
         delete user.password;
         firebase.database().ref(`/users/${response.user.uid}`).set(user);
-        props.history.push("/");
         setSignupMessage({
           type: "success",
           message: "Bienvenido a ChatApp",
         });
-        
+        props.history.push("/");
       })
       .catch((error) => {
         console.log(error);

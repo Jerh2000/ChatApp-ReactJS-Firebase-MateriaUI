@@ -12,17 +12,25 @@ import firebase from "firebase/app";
 import "firebase/database";
 import "firebase/auth";
 import CustomAvatar from "../CustomAvatar";
-import {loadUser} from '../../Utils/dbUtils'
+import { loadUser } from "../../Utils/dbUtils";
 import Message from "./Messages";
+import ListSubheader from "@material-ui/core/ListSubheader";
+import Account from "../Accounts";
+import { Grid } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
   text: {
     padding: theme.spacing(2, 2, 0),
+    paddingBottom:17,
   },
   paper: {
     paddingBottom: 50,
     height: "70vh",
     marginTop: 20,
+    marginRight: 20,
   },
   list: {
     marginBottom: theme.spacing(3),
@@ -52,52 +60,63 @@ const Chat = ({ history }) => {
 
     chatRef.on(
       "child_added",
-      snapshot => {
+      (snapshot) => {
         //New Message
         const messageItem = snapshot.val();
         //Leer los datos de un usuario
-        loadUser(messageItem.user)
-        .then(data => {
-            messageItem.user = data;
-            addMessageList(messageItem);
+        loadUser(messageItem.user).then((data) => {
+          messageItem.user = data;
+          addMessageList(messageItem);
         });
       },
-      error => {
+      (error) => {
         console.log(error);
         if (error.message.includes("permission_denied")) {
           history.push("/login");
         }
       }
-    )
+    );
   }, []);
 
   return (
-    <Container>
-      <Paper square className={classes.paper}>
-        <Typography
-          className={classes.text}
-          variant="h5"
-          gutterBottom
-          style={{ backgroundColor: "#00bcd4", color: "white" }}
-        >
-          Chats
-        </Typography>
-        <List className={classes.list} ref={chatDomRef}>
-          {messages.map(({ date, user, message }) => (
-            <ListItem button key={date}>
-              <ListItemAvatar>
-                <CustomAvatar name={user.name} avatar={user.avatar} size="md" />
-              </ListItemAvatar>
-              <ListItemText
-                primary={user ? user.name : "annonymous"}
-                secondary={message}
-              />
-            </ListItem>
-          ))}
-        </List>
-      </Paper>
-      <Message />
-    </Container>
+    <div className={classes.root}>
+      <Grid container>
+          <Grid xs={12} sm={4}>
+            <Account />
+          </Grid>
+        <Grid xs={12} sm={8}>
+          <Paper square className={classes.paper}>
+            <Typography
+              className={classes.text}
+              variant="h5"
+              gutterBottom
+              style={{ backgroundColor: "#00bcd4", color: "white" }}
+            >
+              Chat
+            </Typography>
+            <List className={classes.list} ref={chatDomRef}>
+              {messages.map(({ date, user, message }) => (
+                <ListItem button key={date}>
+                  <ListSubheader>{date}</ListSubheader>
+                  <ListItemAvatar>
+                    <CustomAvatar
+                      name={user.name}
+                      avatar={user.avatar}
+                      size="md"
+                    />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={user ? user.name : "annonymous"}
+                    secondary={message}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
+          <Message />
+        </Grid>
+      </Grid>
+    </div>
   );
 };
 
