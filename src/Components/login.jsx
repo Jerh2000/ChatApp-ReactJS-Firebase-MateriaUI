@@ -94,7 +94,7 @@ const Login = (props) => {
       .auth()
       .signInWithEmailAndPassword(user.email, user.password)
       .then((response) => {
-        props.history.push("/");
+        props.history.push("/Chat");
       })
       .catch((error) => {
         console.log(error);

@@ -230,7 +230,7 @@ const Profile = (props) => {
           </Button>
           <Grid container justify="flex-end">
             <Grid item>
-              <Link to="/" component={MyLink} variant="body2">
+              <Link to="/Chat" component={MyLink} variant="body2">
                 {"Ir al Chat"}
               </Link>
             </Grid>

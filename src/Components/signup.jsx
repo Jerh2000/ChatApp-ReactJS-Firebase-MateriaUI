@@ -90,7 +90,7 @@ const SignUp = (props) => {
           type: "success",
           message: "Bienvenido a ChatApp",
         });
-        props.history.push("/");
+        props.history.push("/Chat");
       })
       .catch((error) => {
         console.log(error);

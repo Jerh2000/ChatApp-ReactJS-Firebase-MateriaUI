@@ -13,11 +13,12 @@ import "firebase/database";
 import "firebase/auth";
 import CustomAvatar from "./CustomAvatar";
 import "../CCS/Styles.css";
+import { loadUser } from "../Utils/dbUtils";
 
 const useStyles = makeStyles((theme) => ({
   text: {
     padding: theme.spacing(2, 2, 0),
-    paddingBottom:17,
+    paddingBottom: 17,
   },
   paper: {
     paddingBottom: 50,
@@ -35,7 +36,6 @@ const Account = ({ history }) => {
   const classes = useStyles();
   const [user, setUser] = useState([]);
 
-  const chatDomRef = useRef();
 
   const addMessageList = (userr) => {
     user.push(userr);
@@ -43,16 +43,32 @@ const Account = ({ history }) => {
     setUser([...user.sort((a, b) => a.name - b.name)]);
   };
 
+  var id;
   useEffect(() => {
     const chatRef = firebase.database().ref("/users");
 
     chatRef.on(
       "child_added",
       (snapshot) => {
-        //New Message
         const userItem = snapshot.val();
-        console.log(userItem);
+        id = snapshot.key;
         //Leer los datos de un usuario
+        if (userItem.avatar) {
+          // cargar url de avatar
+          firebase
+            .storage()
+            .ref()
+            .child(`/avatars/${userItem.avatar}`)
+            .getDownloadURL()
+            .then(
+              (url) => {
+                userItem.avatar = url;
+              },
+              (error) => {
+                console.log(error.message);
+              }
+            );
+        }
         addMessageList(userItem);
       },
       (error) => {
@@ -76,13 +92,13 @@ const Account = ({ history }) => {
           Personas de MeetApp
         </Typography>
         <List className={classes.list}>
-          {user.map(({ name, avatar, email }) => (
-            <ListItem button>
+          {user.map(({ name, avatar, email}, index) => (
+            <ListItem button key={index}>
               <ListItemAvatar>
                 <CustomAvatar name={name} avatar={avatar} size="md" />
               </ListItemAvatar>
               <ListItemText
-                primary={user ? name : "annonymous"}
+                primary={name ? name : "annonymous"}
                 secondary={email}
               />
             </ListItem>

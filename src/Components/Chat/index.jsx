@@ -24,10 +24,10 @@ const useStyles = makeStyles((theme) => ({
   },
   text: {
     padding: theme.spacing(2, 2, 0),
-    paddingBottom:17,
+    paddingBottom: 17,
   },
   paper: {
-    paddingBottom: 50,
+    paddingBottom: 60,
     height: "70vh",
     marginTop: 20,
     marginRight: 20,
@@ -48,7 +48,7 @@ const Chat = ({ history }) => {
   const addMessageList = (message) => {
     messages.push(message);
 
-    setMessages([...messages.sort((a, b) => a.date - b.date)]);
+    setMessages([...messages.sort((a, b) => a.dateN - b.dateN)]);
 
     if (chatDomRef.current) {
       chatDomRef.current.scrollTop = chatDomRef.current.scrollHeight;
@@ -81,9 +81,9 @@ const Chat = ({ history }) => {
   return (
     <div className={classes.root}>
       <Grid container>
-          <Grid xs={12} sm={4}>
-            <Account />
-          </Grid>
+        <Grid xs={12} sm={4}>
+          <Account />
+        </Grid>
         <Grid xs={12} sm={8}>
           <Paper square className={classes.paper}>
             <Typography
@@ -95,9 +95,9 @@ const Chat = ({ history }) => {
               Chat
             </Typography>
             <List className={classes.list} ref={chatDomRef}>
-              {messages.map(({ date, user, message }) => (
-                <ListItem button key={date}>
-                  <ListSubheader>{date}</ListSubheader>
+              {messages.map(({ date, user, message }, index) => (
+                <ListItem button key={index}>
+                  <ListSubheader spacing={0}>{date}</ListSubheader>
                   <ListItemAvatar>
                     <CustomAvatar
                       name={user.name}

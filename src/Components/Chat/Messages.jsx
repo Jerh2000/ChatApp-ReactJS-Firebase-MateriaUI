@@ -44,10 +44,22 @@ const Message = () => {
     const { currentUser } = firebase.auth();
     if (!currentUser) return;
 
+    function fecha(){
+      var formatDate = new Date();
+      var day = formatDate.getUTCDate();
+      var month = formatDate.getUTCMonth();
+      var year = formatDate.getFullYear();
+      var hour = formatDate.getHours();
+      var min = formatDate.getUTCMinutes();
+
+      return day+"/"+month+"/"+year+", "+hour+":"+min;
+    }
+
     const NewMessage = {
       user: currentUser.uid,
       message,
-      date: firebase.database.ServerValue.TIMESTAMP,
+      date: fecha(),
+      dateN: firebase.database.ServerValue.TIMESTAMP,
     };
     firebase
       .database()
@@ -80,12 +92,12 @@ const Message = () => {
             />
           </Grid>
           <Grid item xs={2}>
-            <Box display="flex" alignItems="center" className={classes.box}>
+            <Box display="flex"  className={classes.box}>
               <Button
                 variant="contained"
                 color="primary"
                 endIcon={
-                  <Icon alignItems="center">
+                  <Icon>
                     send
                   </Icon>
                 }
